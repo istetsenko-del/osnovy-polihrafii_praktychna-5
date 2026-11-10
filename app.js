@@ -12,7 +12,12 @@
   try{state=load();localStorage.setItem(key,JSON.stringify(state));}catch{state=fresh();storageFailed=true;}
   const token=()=>Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
   function endpoint(s){try{const u=new URL(s);return u.protocol==='https:'&&u.hostname==='script.google.com'&&!u.username&&!u.password&&!u.port&&!u.search&&!u.hash&&/^\/macros\/s\/[\w-]+\/exec$/.test(u.pathname)?u.href:'';}catch{return '';}}
-  const configured=()=>state.submitUrl||endpoint(window.PR5_CONFIG?.webAppUrl)||endpoint(state.url);
+  function configured(){
+    const current=endpoint(window.PR5_CONFIG?.webAppUrl),previous=endpoint(window.PR5_CONFIG?.previousWebAppUrl),pinned=endpoint(state.submitUrl);
+    // Only migrate the explicitly replaced receiver; keep the frozen snapshot and its ID.
+    if(state.mode==='pending'&&current&&previous&&pinned===previous)return current;
+    return pinned||current||endpoint(state.url);
+  }
   const total=()=>state.steps.filter(s=>s.done).length;
   const isFrozen=()=>state.mode!=='active';
   const notice=s=>{$('notice').textContent=s;};
@@ -166,7 +171,8 @@
   async function send(){
     if(sending||state.mode!=='pending'||storageFailed||!configured())return;
     if(location.protocol!=='https:'||window.top!==window){sendError='Відкрийте опубліковану сторінку роботи в окремій вкладці.';render();return;}
-    if(!state.submitUrl&&!commit(s=>{s.submitUrl=configured();}))return;
+    const url=configured();
+    if(state.submitUrl!==url&&!commit(s=>{s.submitUrl=url;}))return;
     sending=true;sendError='';show='pending';render();
     try{
       const receipt=await receive(state.submitUrl,state.snapshot);
