@@ -6,7 +6,7 @@
   <meta name="description" content="Практична робота №5. Спуск восьмисторінкового зошита: 10 послідовних кроків, 50 запитань і виробнича карта.">
   <title>Практична 05 — Лабораторія спуску</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
-  <script src="./drive-config.js" defer></script><script src="./data.js" defer></script><script src="./shared.js" defer></script><script src="./app.js" defer></script>
+  <script src="./drive-config.js?v=2" defer></script><script src="./data.js" defer></script><script src="./shared.js" defer></script><script src="./app.js?v=2" defer></script>
 </head>
 <body>
 <a class="skip" href="#step-content">Перейти до поточного кроку</a>
@@ -37,8 +37,7 @@
       <details class="brief receiver" id="receiver" hidden><summary><span>Налаштування для викладача</span><span class="small" id="connection-label">Адреса приймача не задана</span></summary>
         <form id="receiver-form" class="brief-body receiver-body">
           <label>Адреса приймача Google Apps Script<input id="endpoint" type="text" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" maxlength="400" spellcheck="false"></label>
-          <label>Код групи для здавання<input id="access-code" type="password" maxlength="128" autocomplete="off" placeholder="Код від викладача"></label>
-          <p class="hint">Вводьте тільки адресу та код, які надав викладач для роботи №5. Код зберігається в межах цієї вкладки. Налаштування не надсилає роботу до завершення.</p>
+          <p class="hint">Адреса вебзастосунку для практичної №5.</p>
           <div><button class="button secondary" type="submit" id="save-receiver">Зберегти підключення</button></div><p class="hint" role="status" id="connection-status"></p>
         </form>
       </details>

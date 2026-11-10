@@ -1,16 +1,15 @@
 (() => {
   'use strict';
   const course=window.PR5_COURSE, {esc,right,score,numeric,validate}=PR5;
-  const key='opp:practical-05:imposition:v1', codeKey=key+':access';
+  const key='opp:practical-05:imposition:v1';
   const setupMode=new URLSearchParams(location.search).get('setup')==='1';
   const $=id=>document.getElementById(id);
   const fresh=()=>({version:course.version,rev:0,name:'',group:'',url:'',selected:0,mode:'active',started:false,
     visibility:{count:0,ms:0},steps:course.steps.map(()=>({note:'',answers:Array(5).fill(''),first:null,last:null,checks:0,done:false}))});
-  let state,storageFailed=false,code='',hiddenAt=null,sending=false,sendError='',badCode=false,diagramIndex=0;
+  let state,storageFailed=false,hiddenAt=null,sending=false,sendError='',diagramIndex=0;
   const read=()=>JSON.parse(localStorage.getItem(key)||'null');
   function load(){const s=read();if(!s)return fresh();if(s.version!==course.version||!Array.isArray(s.steps)||s.steps.length!==10||!['active','pending','done'].includes(s.mode))throw Error('STATE');if(s.mode!=='active')validate(course,s.snapshot);return s;}
   try{state=load();localStorage.setItem(key,JSON.stringify(state));}catch{state=fresh();storageFailed=true;}
-  try{code=sessionStorage.getItem(codeKey)||'';}catch{}
   const token=()=>Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
   function endpoint(s){try{const u=new URL(s);return u.protocol==='https:'&&u.hostname==='script.google.com'&&!u.username&&!u.password&&!u.port&&!u.search&&!u.hash&&/^\/macros\/s\/[\w-]+\/exec$/.test(u.pathname)?u.href:'';}catch{return '';}}
   const configured=()=>state.submitUrl||endpoint(window.PR5_CONFIG?.webAppUrl)||endpoint(state.url);
@@ -67,9 +66,9 @@
     $('step-content').innerHTML=`<div class="step-heading"><span class="counter">КРОК ${String(i+1).padStart(2,'0')} / 10</span><span class="tag">${esc(step.tag)}</span></div><h2 class="step-title">${esc(step.title)}</h2><p class="step-intro">${esc(step.intro)}</p>${old}<div class="theory"><p class="section-kicker">Дані для рішення</p>${step.theory.map(v=>`<p>${esc(v)}</p>`).join('')}</div><div class="mask-view" id="diagram">${diagram(step.diagram)}</div><div class="task"><h3>Практичне завдання</h3><p>${esc(step.task)}</p><label for="solution">Ваше рішення для звіту</label><textarea id="solution" maxlength="4000" placeholder="Запишіть розрахунки й поясніть ваш вибір…" ${locked?'readonly':''}>${esc(x.note)}</textarea><p class="hint">Текст оцінює викладач. Сайт перевіряє, чи запис заповнено, та оцінює тестові відповіді.</p></div><div class="quiz-heading"><h3>Перевірте рішення</h3><span>5 запитань</span></div>${questions}<p class="check-status" id="check-status" role="status">${first===null?'Після першої перевірки тут з’явиться її результат.':`Перша перевірка: ${first}/5 · Остання перевірка: ${last}/5 · Перевірок: ${x.checks}.`}${x.done?' Крок завершено.':''}</p><div class="actions">${!locked?'<button type="button" id="check" class="button">Перевірити 5 відповідей</button>':''}${x.done&&i<9?'<button type="button" id="next" class="button">До наступного кроку →</button>':''}${i>0?'<button type="button" id="prev" class="button secondary">← Попередній крок</button>':''}</div>`;
   }
   function renderSubmission(){
-    const ready=Boolean(configured()&&code),needsCode=Boolean(configured()&&(!code||badCode)&&!sending);
-    const text=sending?'Зберігаємо роботу…':sendError||(needsCode?'Введіть код, який надав викладач.':!configured()?'Відповіді зафіксовано. Підсумок буде доступний після збереження.':'Очікуємо підтвердження збереження.');
-    $('submission').innerHTML=`<div class="email-panel"><h3>Збереження роботи</h3><p role="status" class="${sendError?'email-status error':''}">${esc(text)}</p>${needsCode?'<form id="student-code-form" class="receiver-body"><label>Код роботи<input id="student-code" type="password" maxlength="128" autocomplete="off" required></label><button class="button secondary" type="submit">Підтвердити код</button></form>':''}${sendError&&ready&&!badCode&&!sending?'<button id="retry" class="button" type="button">Повторити збереження</button>':''}</div>`;
+    const ready=Boolean(configured());
+    const text=sending?'Зберігаємо роботу…':sendError||(!ready?'Відповіді зафіксовано. Підсумок буде доступний після збереження.':'Очікуємо підтвердження збереження.');
+    $('submission').innerHTML=`<div class="email-panel"><h3>Збереження роботи</h3><p role="status" class="${sendError?'email-status error':''}">${esc(text)}</p>${sendError&&ready&&!sending?'<button id="retry" class="button" type="button">Повторити збереження</button>':''}</div>`;
   }
   function renderSummary(){
     const s=state.snapshot;
@@ -81,11 +80,10 @@
     $('receiver').hidden=!setupMode;
     $('student-name').value=state.name;$('student-group').value=state.group;
     $('student-name').readOnly=$('student-group').readOnly=isFrozen()||storageFailed;
-    $('endpoint').value=configured()||state.url;$('access-code').value=code;
+    $('endpoint').value=configured()||state.url;
     $('endpoint').readOnly=!!(state.submitUrl||endpoint(window.PR5_CONFIG?.webAppUrl))||storageFailed;
-    $('access-code').disabled=state.mode==='done'||storageFailed;
     $('save-receiver').disabled=state.mode==='done'||storageFailed;
-    $('connection-label').textContent=configured()?(code?'Адресу й код задано':'Потрібен код групи'):'Адреса приймача не задана';
+    $('connection-label').textContent=configured()?'Адресу задано':'Адреса приймача не задана';
     $('step-content').hidden=show!=='step';$('submission').hidden=show!=='pending';$('summary-content').hidden=show!=='done';
     if(show==='pending')renderSubmission();else if(show==='done')renderSummary();else renderStep();
     if(storageFailed)notice('Збереження недоступне. Сайт не дозволить почати або зафіксувати спробу без робочого сховища браузера.');
@@ -127,12 +125,6 @@
     $('step-nav').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(b&&!b.disabled)go(Number(b.dataset.step));});
     $('summary-button').addEventListener('click',()=>{if(state.mode==='done'){show='done';render();$('summary-content').focus();$('summary-content').scrollIntoView({block:'start'});}});
     $('submission').addEventListener('click',e=>{if(e.target.id==='retry')void send();});
-    $('submission').addEventListener('submit',e=>{
-      if(e.target.id!=='student-code-form')return;
-      e.preventDefault();const value=$('student-code').value.trim();if(!value)return;
-      code=value;badCode=false;sendError='';try{sessionStorage.setItem(codeKey,code);}catch{}
-      void send();
-    });
     $('summary-content').addEventListener('click',e=>{
       if(e.target.id!=='download'||state.mode!=='done')return;
       const url=URL.createObjectURL(new Blob([PR5.report(course,state.snapshot,state.receipt)],{type:'text/html;charset=utf-8'}));
@@ -142,21 +134,19 @@
       e.preventDefault();if(!setupMode||storageFailed||state.mode==='done')return;
       const url=state.submitUrl||endpoint(window.PR5_CONFIG?.webAppUrl)||endpoint($('endpoint').value.trim());
       if(!url){$('connection-status').textContent='Потрібна повна адреса script.google.com, яка закінчується /exec.';return;}
-      const access=$('access-code').value.trim();if(!access){$('connection-status').textContent='Введіть код групи, який надав викладач.';return;}
       if(!commit(s=>{s.url=url;}))return;
-      code=access;try{sessionStorage.setItem(codeKey,code);}catch{}
-      sendError='';badCode=false;if(state.mode==='pending')show='pending';render();$('connection-status').textContent='Підключення збережено у браузері.';
+      sendError='';if(state.mode==='pending')show='pending';render();$('connection-status').textContent='Підключення збережено у браузері.';
       if(state.mode==='pending')void send();
     });
   }
   // POST into an isolated frame. Only a matching receipt from Apps Script counts as saved.
-  function receive(url,access,snapshot){
+  function receive(url,snapshot){
     return new Promise((resolve,reject)=>{
       const nonce=token(),frame=document.createElement('iframe'),form=document.createElement('form');
       frame.name='pr5_'+nonce;frame.title='Квитанція Google Apps Script';frame.hidden=true;
       form.method='POST';form.action=url;form.target=frame.name;form.hidden=true;
       const origin=location.origin;
-      for(const [name,value] of Object.entries({origin,nonce,code:access,payload:JSON.stringify(snapshot)})){const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input);}
+      for(const [name,value] of Object.entries({origin,nonce,payload:JSON.stringify(snapshot)})){const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;form.append(input);}
       const cleanup=()=>{clearTimeout(timer);window.removeEventListener('message',ack);form.remove();frame.remove();};
       const ack=e=>{
         let host;try{const u=new URL(e.origin);if(u.protocol!=='https:')return;host=u.hostname;}catch{return;}
@@ -172,18 +162,18 @@
       try{form.submit();}catch{cleanup();reject(Error('NETWORK'));}
     });
   }
-  const messages={ACCESS:'Код не підійшов. Перевірте його й введіть ще раз.',CONFIG:'Не вдалося зберегти роботу. Повідомте викладача.',VALIDATION:'Не вдалося зберегти роботу. Повідомте викладача.',ANSWERS:'Не вдалося зберегти роботу. Повідомте викладача.',CONFLICT:'Не вдалося підтвердити збереження. Повідомте викладача.',BUSY:'Збереження затримується. Спробуйте ще раз.',STORAGE:'Не вдалося зберегти роботу. Повідомте викладача.'};
+  const messages={CONFIG:'Не вдалося зберегти роботу. Повідомте викладача.',VALIDATION:'Не вдалося зберегти роботу. Повідомте викладача.',ANSWERS:'Не вдалося зберегти роботу. Повідомте викладача.',CONFLICT:'Не вдалося підтвердити збереження. Повідомте викладача.',BUSY:'Збереження затримується. Спробуйте ще раз.',STORAGE:'Не вдалося зберегти роботу. Повідомте викладача.'};
   async function send(){
-    if(sending||state.mode!=='pending'||storageFailed||!configured()||!code)return;
+    if(sending||state.mode!=='pending'||storageFailed||!configured())return;
     if(location.protocol!=='https:'||window.top!==window){sendError='Відкрийте опубліковану сторінку роботи в окремій вкладці.';render();return;}
     if(!state.submitUrl&&!commit(s=>{s.submitUrl=configured();}))return;
     sending=true;sendError='';show='pending';render();
     try{
-      const receipt=await receive(state.submitUrl,code,state.snapshot);
+      const receipt=await receive(state.submitUrl,state.snapshot);
       if(commit(s=>{s.receipt=receipt;s.mode='done';})){
-        show='done';try{sessionStorage.removeItem(codeKey);}catch{}code='';render();$('summary-content').focus();$('summary-content').scrollIntoView({block:'start'});
+        show='done';render();$('summary-content').focus();$('summary-content').scrollIntoView({block:'start'});
       }
-    }catch(e){badCode=e.message==='ACCESS';sendError=messages[e.message]||'Збереження не підтверджено. Перевірте інтернет і спробуйте ще раз.';}
+    }catch(e){sendError=messages[e.message]||'Збереження не підтверджено. Перевірте інтернет і спробуйте ще раз.';}
     finally{sending=false;render();}
   }
   function visibility(closing=false){

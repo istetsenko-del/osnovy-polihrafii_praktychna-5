@@ -1,3 +1,2 @@
-// Викладач може вписати адресу нового приймача ПР5 (закінчується /exec).
-// Код групи сюди не вписуйте. Якщо поле порожнє, адресу задають на сайті.
-window.PR5_CONFIG = Object.freeze({webAppUrl: ''});
+// Адреса приймача ПР5.
+window.PR5_CONFIG = Object.freeze({webAppUrl: 'https://script.google.com/macros/s/AKfycbxeCI3Uu_vh5AgFiWI8T3h3yXOE9Tt5dkv_-KQqZhCbp7RSijTj2Shtl4sBETGqkW0TGQ/exec'});
