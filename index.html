@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#163c37">
+  <meta name="description" content="Практична робота №5. Спуск восьмисторінкового зошита: 10 послідовних кроків, 50 запитань і виробнича карта.">
+  <title>Практична 05 — Лабораторія спуску</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
+  <script src="./drive-config.js" defer></script><script src="./data.js" defer></script><script src="./shared.js" defer></script><script src="./app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#step-content">Перейти до поточного кроку</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Навігація практичною роботою">
+    <a href="./" class="brand"><span class="brand-icon" aria-hidden="true">◫</span><span>PRINT<br><strong>STUDIO / 05</strong></span></a>
+    <div class="course-label">ОСНОВИ ПОЛІГРАФІЧНОГО ВИРОБНИЦТВА</div>
+    <h2 class="side-title">Лабораторія<br>спуску</h2>
+    <div class="progress-copy"><span id="progress-label">0 із 10 кроків</span><span id="progress-percent">0 %</span></div>
+    <progress id="progress" max="10" value="0" aria-label="Завершені кроки"></progress>
+    <nav id="step-nav" aria-label="Кроки роботи"></nav>
+    <button id="summary-button" class="side-report" type="button" disabled>↗ Підсумок і звіт</button>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><span>ПРАКТИЧНА РОБОТА № 5</span><span class="pill">Онлайн · 2 курс</span></header>
+    <main id="main" tabindex="-1">
+      <div class="page-eyebrow">ВІД СТОРІНКОВОГО PDF ДО ДРУКАРСЬКОЇ ФОРМИ</div>
+      <h1>Форма та<br><em>виробничий спуск.</em></h1>
+      <p class="lead">Підготуйте восьмисторінковий зошит «Маршрут книжки»: простежте два згини, знайдіть помилку на звороті й видайте виробничу карту для друкарні.</p>
+      <section class="overview" aria-label="Як працювати">
+        <div><strong>10</strong><span>послідовних кроків</span></div><div><strong>50</strong><span>запитань із поясненнями</span></div><div><strong>1</strong><span>виробнича карта спуску</span></div>
+        <p>Запишіть власне рішення й дайте п’ять правильних відповідей на кожному кроці. Виправляйте помилки за поясненнями. Результат першої перевірки зберігається окремо. Орієнтир — одна онлайн-пара; до роботи можна повернутися в цьому браузері.</p>
+      </section>
+      <details class="brief"><summary><span>Картка замовлення</span><span class="small">Вихідні умови кейсу</span></summary>
+        <div class="brief-body"><div><h3>Виріб</h3><p>500 зошитів, 8 сторінок, готова сторінка 105 × 148 мм. Обкладинка входить до обсягу. Читання зліва направо, корінець ліворуч.</p></div><div><h3>Виробничий маршрут</h3><p>Один двобічний аркуш на зошит, 1 + 1, два перпендикулярні згини, скоба через корінець. У вихідному спуску є одна помилка повороту. Для вправи достатньо схем і калькулятора.</p></div></div>
+      </details>
+      <section class="identity" aria-label="Дані студента"><label>ПІБ студента<input id="student-name" autocomplete="name" placeholder="Прізвище, ім’я та по батькові" maxlength="120"></label><label>Група<input id="student-group" placeholder="Наприклад, ВП-21" maxlength="40"></label></section>
+      <details class="brief receiver" id="receiver" hidden><summary><span>Налаштування для викладача</span><span class="small" id="connection-label">Адреса приймача не задана</span></summary>
+        <form id="receiver-form" class="brief-body receiver-body">
+          <label>Адреса приймача Google Apps Script<input id="endpoint" type="text" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" maxlength="400" spellcheck="false"></label>
+          <label>Код групи для здавання<input id="access-code" type="password" maxlength="128" autocomplete="off" placeholder="Код від викладача"></label>
+          <p class="hint">Вводьте тільки адресу та код, які надав викладач для роботи №5. Код зберігається в межах цієї вкладки. Налаштування не надсилає роботу до завершення.</p>
+          <div><button class="button secondary" type="submit" id="save-receiver">Зберегти підключення</button></div><p class="hint" role="status" id="connection-status"></p>
+        </form>
+      </details>
+      <section id="step-content" tabindex="-1" aria-label="Поточний крок"></section>
+      <section id="submission" tabindex="-1" hidden aria-label="Збереження роботи"></section>
+      <section id="summary-content" tabindex="-1" hidden aria-label="Підсумок роботи"></section>
+      <footer class="footer"><span>Навчальна майстерня · Лекції 16–17 · Видавництво та поліграфія</span></footer>
+      <p id="notice" role="status" class="notice"></p>
+    </main>
+  </div>
+</div>
+<noscript><p class="noscript">Для інтерактивних завдань увімкніть JavaScript у браузері.</p></noscript>
+</body></html>
